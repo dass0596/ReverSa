@@ -1,3 +1,8 @@
+'''
+Created on 10 de mar. de 2016
+
+@author: Daniela Sanchez
+'''
 from Bio.SeqUtils import GC
 from itertools import product, tee, izip
 
@@ -5,21 +10,33 @@ from collections import OrderedDict
 from Bio import SeqIO
 
 import numpy as np
-import pandas as p
-
+import pandas as pd
+        
 class Composition:
-    def __init__(self, fasta_file, kmer_len = 4, space = 2):
-        self.fasta = fasta_file
+    '''
+    Calculate composition features(gc content, kmers) of the sequences  
+    '''
+    def __init__(self, kmer_len):
         self.kmer_len = kmer_len
-        self.space = space
+        self.gc_data = None 
+        self.composition_df = None
+        self.join = None
+        
+    def openFastaFile(self):
+        self.fastaFile = open("windows_sequence.fasta" , "r")
         
     def gc_content(self):
-        GC_d = OrderedDict()
-        for seq in SeqIO.parse(self.fasta, "fasta"):
+        #Calculates G+C content for each window
+        gc_d = OrderedDict()
+        self.openFastaFile()
+        for seq in SeqIO.parse(self.fastaFile, "fasta"):
             cal = GC(str(seq.seq))
-            GC_d[seq.id] = cal / 100.0
-        GC_data = p.DataFrame.from_dict(GC_d, orient='index', dtype=float)
-        print GC_data
+            gc_d[seq.id] = cal / 100
+        gc = pd.DataFrame.from_dict(gc_d, orient='index', dtype=float)
+        gc.columns = ['GC']
+        self.gc_data = np.log(gc['GC'])
+        self.fastaFile.close()
+        
     
     def generate_feature_mapping(self):
         #Generate kmer dictionary
@@ -37,7 +54,8 @@ class Composition:
     def calculate_kmer(self):
         kmer_hash , counter = self.generate_feature_mapping()
         composition_d = OrderedDict()
-        for seq in SeqIO.parse(self.fasta, "fasta"):
+        self.openFastaFile()
+        for seq in SeqIO.parse(self.fastaFile, "fasta"):
             kmers = [
                 kmer_hash[kmer_tuple]
                 for kmer_tuple 
@@ -48,30 +66,22 @@ class Composition:
             composition_v = np.bincount(np.array(kmers))
             composition_v[-1] -= 1
             composition_d[seq.id] = composition_v + np.ones(counter)
-        composition = p.DataFrame.from_dict(composition_d, orient='index', dtype=float)
-        #Normalize kmer frequencies 
-        #log(p_ij) = log[(X_ij +1) / rowSum(X_ij+1)]
-        composition = np.log(composition.divide(composition.sum(axis=1),axis=0))
-        return composition
-            
+        composition_p = pd.DataFrame.from_dict(composition_d, orient='index', dtype=float)
+        #Normalize kmer frequencies, log(p_ij) = log[(X_ij +1) / rowSum(X_ij+1)]
+        self.composition_df = np.log(composition_p.divide(composition_p.sum(axis=1),axis=0))
+        self.fastaFile.close()
+                 
     def window(self, str_seq):
         els = tee(str_seq, self.kmer_len)
         for i,el in enumerate(els):
             for _ in xrange(i):
                 next(el, None)
         return izip(*els)
-
+        
     def joined(self):
-    #Join both data 
-        comp = self.calculate_kmer()
-        gc = self.gc_content()
+    #Join both clustering(GC and kmers) 
+        self.gc_content()
+        self.calculate_kmer()
+        self.join = pd.concat([self.composition_df, self.gc_data], axis= 1, join='inner')
+        return self.join
         
-        
-#out = open("composition.csv", "w")
-in_seq = open("zamora_verde.fasta" , "r")
-Comp_results = Composition(in_seq, 4 , 2)
-Comp_results.gc_content()
-#Comp_results.calculate_kmer()
-#Comp_results.joined()
-#out.write()
-#out.close()

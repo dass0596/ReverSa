@@ -4,7 +4,8 @@ import sys
 import pandas as pd
 
 from preprocessing import Preprocessing
-from similarity import Similarity
+#from similarity import Similarity
+from test import Similarity
 from composition import Composition
 from pca import Reduction
 from clustering import Clustering
@@ -19,7 +20,7 @@ def main(args, config):
     print >> sys.stderr, "Created windows_sequence.fasta"
     
     #Instance Similarity and Composition class
-    sim = Similarity(config['score_adj'])
+    sim = Similarity(args.fasta_file, config['score_adj'])
     sim_matrix = sim.calculate_adjacency() 
     comp_results = Composition(config['kmer_len'])
     comp_matrix = comp_results.joined()
@@ -38,14 +39,14 @@ def main(args, config):
     print >> sys.stderr, "Performed clustering plot"
     
     #Instance ClusterReport class
-    report = ClusterReport(clust_obj)
-    file_name = report.output_queryseq()
-    print >> sys.stderr, "Done report of clusters"
-    
+    #report = ClusterReport(clust_obj)
+    #file_name = report.output_queryseq()
+    #print >> sys.stderr, "Done report of clusters"
+
     #Instance Validate class
-    valid = Validate(file_name, args.fasta_file)
-    valid.roundTwo()
-    print >> sys.stderr, "Validation of results"
+    #valid = Validate(file_name, args.fasta_file)
+    #valid.roundTwo()
+    #print >> sys.stderr, "Validation of results"
 
 if __name__ == '__main__':
     args, config = arguments()
