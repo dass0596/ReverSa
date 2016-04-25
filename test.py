@@ -5,16 +5,17 @@ Created on 7 de abr. de 2016
 '''
 import dendropy
 import pandas as pd
-
+import numpy as np
+import re
 
 from Bio.Emboss.Applications import WaterCommandline
 from Bio import SeqIO
-from collections import OrderedDict
 from Bio.Align.Applications import MafftCommandline
 from Bio.Phylo.Applications import RaxmlCommandline
 
-import re
-import numpy as np
+from collections import OrderedDict
+from mcl.mcl_clustering import mcl
+from itertools import groupby
 
 
 class Similarity():
@@ -45,6 +46,7 @@ class Similarity():
                 if i == j:
                     max_score = similitud.loc[i,j]
                 similitud.loc[i,j] = 1-(similitud.loc[i,j]/max_score)
+        similitud.to_csv('data_sim.csv')
         self.similitud = similitud
         
     def generate_dist(self):
@@ -75,7 +77,8 @@ class Similarity():
             for j in self.similitud.columns.tolist():
                 left_column = pattern.split(j)[0]
                 dist_score =  1-df.loc[left_row,left_column]
-                self.similitud.loc[i,j] = self.similitud.loc[i,j] * dist_score         
+                self.similitud.loc[i,j] = self.similitud.loc[i,j] * dist_score
+        self.similitud.to_csv('sim_dist.csv')         
             
     def calculate_adjacency(self):
         #calculate adjacency depend on the sequence(index!=column) and the score(K>Value[i,j])
@@ -92,6 +95,25 @@ class Similarity():
                         valor = 1
                 self.similitud.loc[i,j]= valor
         self.similitud.to_csv('dist_adjmatrix.csv')
+        
+    def mcl_perform(self):
+        self.calculate_adjacency()
+        count = 0 
+        d_values = self.similitud.values
+        M, clusters = mcl(d_values)
+        valid_dict = {}
+        for i in clusters:
+            if len(clusters[i]) > 1:
+                valid_dict[i] = clusters[i]
+        keys = sorted(valid_dict)
+        dict1 = dict(zip(keys, (x for x, y in groupby(valid_dict[k] for k in keys))))                
+        for h in dict1.values():
+            count += 1
+            for o in h:
+                for m in h:
+                    if o != m:
+                        self.similitud.iloc[o,m] = count
+        self.similitud.to_csv('adjacency_modif.csv')
         adjacency = np.sum(self.similitud,axis=1)
         #replace 0 to avoid inf values in the normalization
         ad = adjacency.replace(0,0.00001)

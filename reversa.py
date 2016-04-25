@@ -4,8 +4,7 @@ import sys
 import pandas as pd
 
 from preprocessing import Preprocessing
-#from similarity import Similarity
-from test import Similarity
+from similarity import Similarity
 from composition import Composition
 from pca import Reduction
 from clustering import Clustering
@@ -21,7 +20,7 @@ def main(args, config):
     
     #Instance Similarity and Composition class
     sim = Similarity(args.fasta_file, config['score_adj'])
-    sim_matrix = sim.calculate_adjacency() 
+    sim_matrix = sim.mcl_perform() 
     comp_results = Composition(config['kmer_len'])
     comp_matrix = comp_results.joined()
     #Join similarity and composition matrix for PCA
