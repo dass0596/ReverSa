@@ -92,7 +92,7 @@ class StatsBinom():
         
         resultado = zip(validWin, validpval)    
         for i in resultado:
-            print i
+            print 'combination: %s  pvalue: %s' %(i[0],i[1])
         #positive = [i for i, x in enumerate(adjpvalues) if x <= 1.00e-20]
         #validWin  = [combinations[x] for x in positive]
             #if pvalue <= 1.00e-20:

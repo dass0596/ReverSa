@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 import pandas as pd
 
 from preprocessing import Preprocessing
@@ -13,6 +14,7 @@ from postprocessing import Validate
 from jplace import ParseJplace
 from stats import Profiles
 from binomial import StatsBinom
+from clean import cleaning
 from parse import arguments
 
 
@@ -65,6 +67,8 @@ def main(args, config):
     finalResult = StatsBinom(args.fasta_file, config['win_length'],bestWin)
     finalResult.binomial()
     
+    cleaning()
+
 
 if __name__ == '__main__':
     args, config = arguments()
