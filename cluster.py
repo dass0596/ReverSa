@@ -53,8 +53,7 @@ class ClusterReport():
         #Discard false positives depend on avg_width and multispecies of cluster.
         self.clust_read()  
         pattern = re.compile(r'_')
-        limit = 0.96
-        clust_multi = []
+        #limit = 0.96
         self.clust_valid = []
         for i in self.silinfo.index.tolist():
             win_cluster = self.silinfo.loc[i,'win_id']
@@ -63,20 +62,21 @@ class ClusterReport():
                 id2 = pattern.split(j)[0]
                 if id1 != id2:
                     #add to the tuple the clusters that pass the condition
-                    clust_multi = clust_multi + [i,] 
-                    if (self.avg_wid/self.cl_width[i-1]) <= limit:
-                        self.clust_valid = self.clust_valid + [i,]
+                    self.clust_valid = self.clust_valid + [i,] 
+                    #if (self.avg_wid/self.cl_width[i-1]) <= limit:
+                        #self.clust_valid = self.clust_valid + [i,]
                     break  
-        len_multi = len(clust_multi)
         len_valid = len(self.clust_valid)
-        print >> sys.stderr, 'Performed filter,resulted in %i cluster multispecies and %i cluster valid' % (len_multi,len_valid) 
+        print >> sys.stderr, 'Performed filter,resulted in %i cluster multispecies' %len_valid 
             
     def output_queryseq(self):
         #Select only the windows that pass filter and save them in a fastafile
         self.filter()    
         file_id = []
+        seqClust = {}
         for a in self.clust_valid:
             valid_win = self.silinfo.loc[a,'win_id']
+            seqClust[a] = valid_win
             #save for each cluster a fasta file with the sequences of the cluster
             handle = 'query_sequences_%i_.fasta' %a
             file_id = file_id + [handle,]
@@ -87,4 +87,4 @@ class ClusterReport():
                     if b == fasta.id:
                         output_file.write('>' + fasta.id +'\n' + str(fasta.seq) + '\n')                 
             output_file.close()               
-        return file_id
+        return file_id, seqClust

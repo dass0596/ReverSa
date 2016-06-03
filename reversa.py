@@ -10,7 +10,11 @@ from pca import Reduction
 from clustering import Clustering
 from cluster import ClusterReport
 from postprocessing import Validate
+from jplace import ParseJplace
+from stats import Profiles
+from binomial import StatsBinom
 from parse import arguments
+
 
 def main(args, config):
     #Instance Preprocessing class
@@ -38,14 +42,29 @@ def main(args, config):
     print >> sys.stderr, "Performed clustering plot"
     
     #Instance ClusterReport class
-    #report = ClusterReport(clust_obj)
-    #file_name = report.output_queryseq()
-    #print >> sys.stderr, "Done report of clusters"
+    report = ClusterReport(clust_obj)
+    file_name, querySeq = report.output_queryseq()
+    print >> sys.stderr, "Done report of clusters"
 
     #Instance Validate class
-    #valid = Validate(file_name, args.fasta_file)
-    #valid.roundTwo()
-    #print >> sys.stderr, "Validation of results"
+    valid = Validate(file_name, args.fasta_file)
+    jfileComp, jfileMinus = valid.roundTwo()
+    print >> sys.stderr, "Validation of results"
+    
+    #Instance ParseJplace Class
+    parsing = ParseJplace(jfileComp, jfileMinus)
+    corrMat = parsing.correlation()
+    print >> sys.stderr, "Doing profiles"
+    
+    #Instance Profile Class
+    ttest = Profiles(corrMat, querySeq)
+    bestWin = ttest.windowsAssigment()
+    print >>sys.stderr, "Doing permutations"
+    
+    #Instance StatsBinom
+    finalResult = StatsBinom(args.fasta_file, config['win_length'],bestWin)
+    finalResult.binomial()
+    
 
 if __name__ == '__main__':
     args, config = arguments()
