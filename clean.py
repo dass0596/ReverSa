@@ -5,9 +5,13 @@ Created on 3 de jun. de 2016
 '''
 import os
 
-def cleaning():
+def cleaning(queryFiles):
     currentDir = os.getcwd()
-    print currentDir
+    os.remove('needle.txt')
+    os.remove('needle1.txt')
+    os.remove('water.txt')
+    for i in queryFiles:
+        os.remove(i)
     dirPath = "%s/testing" %currentDir
     fileList = os.listdir(dirPath)
     for fileName in fileList:

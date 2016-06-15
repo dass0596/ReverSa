@@ -67,7 +67,7 @@ def main(args, config):
     finalResult = StatsBinom(args.fasta_file, config['win_length'],bestWin)
     finalResult.binomial()
     
-    cleaning()
+    cleaning(file_name)
 
 
 if __name__ == '__main__':

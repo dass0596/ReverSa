@@ -27,17 +27,11 @@ class StatsBinom():
         patt2= re.compile('\#\sGaps\:\s+(\d+)\/\d+')
         out = open("reversa_result.txt", "w")
         
-        rawpvalues = []
-        combinations = []
-       
         for j, i in self.bestWin.items():
             out.write('cluster %s \n' %j)
-            
             for a, b in itertools.combinations(i,2):
                 seq1 = patt.split(a)[0]
                 seq2 = patt.split(b)[0]
-                win = "%s %s" %(a,b)
-                combinations.append(win)
                 for fasta in SeqIO.parse(self.fastaFile, "fasta"):
                     if fasta.id == seq1:
                         aseq = str(fasta.seq)
@@ -77,27 +71,10 @@ class StatsBinom():
                 size = self.sizeWin
                 totalDif= 1-(float(identity)/100)
                 pvalue = stats.binom.cdf(difWin, size, totalDif)
-                rawpvalues.append(pvalue)
                 
-                out.write('combination: %s  %s pvalue: %s \n' %(a,b,pvalue))
-                #if pvalue <= 1.00e-20:
+                if pvalue <= 1.00e-20:
                     #print 'combination:', a, b, 'pvalue: ', pvalue
-                    #out.write('combination: %s  %s pvalue: %s \n' %(a,b,pvalue))
-                
-        adjpvalues = multipletests(rawpvalues, alpha=0.05, method='hs', is_sorted=False, returnsorted=False)[1]
+                    out.write('combination: %s  %s pvalue: %s \n' %(a,b,pvalue))
         
-        positive = [i for i, x in enumerate(adjpvalues) if x <= 1.00e-20]
-        validWin  = [combinations[x] for x in positive]
-        validpval = [i for i in adjpvalues if i <= 1.00e-20]
-        
-        resultado = zip(validWin, validpval)    
-        for i in resultado:
-            print 'combination: %s  pvalue: %s' %(i[0],i[1])
-        #positive = [i for i, x in enumerate(adjpvalues) if x <= 1.00e-20]
-        #validWin  = [combinations[x] for x in positive]
-            #if pvalue <= 1.00e-20:
-                #print 'combination:', a, b, 'pvalue: ', pvalue
-                #out.write('combination: %s  %s pvalue: %s \n' %(a,b,adjpvalues))
-                    
         out.close()
                 
