@@ -18,8 +18,9 @@ class Clustering():
         #Calculate correlation data from the PCA transform data
         data_transpose = self.pcaData.transpose()
         correlation = data_transpose.corr(method='pearson')
+        correlation.to_csv('pcaDat.csv')
         self.r_correlation = pandas2ri.py2ri(correlation)
-    
+        
     def calculate_k(self):
         self.correlation_data()
         #Calculate k as number of cluster needed

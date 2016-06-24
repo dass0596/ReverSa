@@ -36,7 +36,7 @@ class Similarity():
             scores = []
             for line in open('water.txt'):
                 scores += pattern.findall(line)
-                similitud_d[seq.id] = scores
+                similitud_d[seq.id] = scores               
         similitud = pd.DataFrame.from_dict(similitud_d, orient='index', dtype=float)
         #set the same names for index and columns
         similitud.columns = similitud.index.tolist()
@@ -46,7 +46,7 @@ class Similarity():
                 if i == j:
                     max_score = similitud.loc[i,j]
                 similitud.loc[i,j] = 1-(similitud.loc[i,j]/max_score)
-        similitud.to_csv('data_sim.csv')
+        #similitud.to_csv('data_sim.csv')
         self.similitud = similitud
         
     def generate_dist(self):
@@ -81,7 +81,7 @@ class Similarity():
                 #normalize the distance value
                 dist_score =  1-df.loc[left_row,left_column]
                 self.similitud.loc[i,j] = self.similitud.loc[i,j] * dist_score
-        self.similitud.to_csv('sim_dist.csv')         
+        #self.similitud.to_csv('sim_dist.csv')         
             
     def calculate_adjacency(self):
         #calculate adjacency depend on the sequence(index!=column) and the score(K>Value[i,j])

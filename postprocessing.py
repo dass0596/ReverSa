@@ -86,5 +86,5 @@ class Validate():
                     self.jfileMinus.append(jason_name)
                     
                     #wrap pplacer
-                    os.system('~/Escritorio/software/pplacer/./pplacer --out-dir pplacer  -p -t testing/RAxML_result.%s -s testing/RAxML_info.%s %s' % (rax_name, rax_name, multiali_name))       
+                    os.system('pplacer --out-dir pplacer  -p -t testing/RAxML_result.%s -s testing/RAxML_info.%s %s' % (rax_name, rax_name, multiali_name))       
         return self.jfile, self.jfileMinus

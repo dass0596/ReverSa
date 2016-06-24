@@ -10,6 +10,7 @@ def cleaning(queryFiles):
     os.remove('needle.txt')
     os.remove('needle1.txt')
     os.remove('water.txt')
+    os.remove('distance.csv')
     for i in queryFiles:
         os.remove(i)
     dirPath = "%s/testing" %currentDir
