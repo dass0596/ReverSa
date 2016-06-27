@@ -20,9 +20,10 @@ from itertools import groupby
 
 class Similarity():
     
-    def __init__(self, filename, score_adj):
+    def __init__(self, filename, score_adj,wDir):
         self.score = score_adj
         self.fasta_seq = filename
+        self.cwPath = "%s/testing" %wDir
         self.similitud_m = None
         self.norm_matrix = None 
     
@@ -60,7 +61,7 @@ class Similarity():
         fastaFile = 'testing/align.fasta'
         SeqIO.convert(phyFile, 'phylip', fastaFile, 'fasta')
         #Create phylogenetic tree of the original sequences
-        raxml_cline = RaxmlCommandline(sequences=phyFile, model='GTRGAMMA', name='reversatest', working_dir='~/workspace/reversa/testing')
+        raxml_cline = RaxmlCommandline(sequences=phyFile, model='GTRGAMMA', name='reversatest', working_dir=self.cwPath)
         raxml_cline()
         #Calculate the phylo distances between each branch of the tree
         tree = dendropy.Tree.get_from_path("testing/RAxML_result.reversatest", "newick")

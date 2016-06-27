@@ -17,10 +17,11 @@ class Validate():
     Validate results by a reference tree and a multiple alignment
     '''
     
-    def __init__(self, query_names, fasta):
+    def __init__(self, query_names, fasta, wDir):
         #"query names" list with  file names of query sequences 
         self.query_name = query_names
         self.fasta_seq = fasta
+        self.cwPath = "%s/testing" %wDir
         self.jfile = None
         self.jfileMinus = None
         
@@ -39,7 +40,7 @@ class Validate():
             self.jfile.append(jason_name)
             for a in alignFile:
                 #wrap pplacer
-                os.system('~/Escritorio/software/pplacer/./pplacer --out-dir pplacer  -p -t testing/RAxML_result.reversatest -s testing/RAxML_info.reversatest testing/%s' %a)
+                os.system('pplacer --out-dir pplacer  -p -t testing/RAxML_result.reversatest -s testing/RAxML_info.reversatest testing/%s' %a)
         
     def roundTwo(self):
         self.roundOne()
@@ -73,7 +74,7 @@ class Validate():
                     SeqIO.convert(phy_name, 'phylip', fasta_name, 'fasta', )
     
                     #Create reference tree
-                    raxml_line = RaxmlCommandline(sequences=phy_name, model='GTRGAMMA', name=rax_name, working_dir= '~/workspace/reversa/testing' )
+                    raxml_line = RaxmlCommandline(sequences=phy_name, model='GTRGAMMA', name=rax_name, working_dir=self.cwPath)
                     raxml_line()
                 
                 #Add query sequences to the previous alignment

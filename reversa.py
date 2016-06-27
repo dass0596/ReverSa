@@ -19,13 +19,14 @@ from parse import arguments
 
 
 def main(args, config):
+    wDir = os.getcwd()
     #Instance Preprocessing class
     window = Preprocessing(args.fasta_file, config['win_length'], config['win_step'])
     window.output_window()
     print >> sys.stderr, "Created windows_sequence.fasta"
     
     #Instance Similarity and Composition class
-    sim = Similarity(args.fasta_file, config['score_adj'])
+    sim = Similarity(args.fasta_file, config['score_adj'],wDir)
     sim_matrix = sim.mcl_perform() 
     comp_results = Composition(config['kmer_len'])
     comp_matrix = comp_results.joined()
@@ -49,7 +50,7 @@ def main(args, config):
     print >> sys.stderr, "Done report of clusters"
 
     #Instance Validate class
-    valid = Validate(file_name, args.fasta_file)
+    valid = Validate(file_name, args.fasta_file,wDir)
     jfileComp, jfileMinus = valid.roundTwo()
     print >> sys.stderr, "Validation of results"
     
