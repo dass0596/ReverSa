@@ -17,3 +17,8 @@ def cleaning(queryFiles):
     fileList = os.listdir(dirPath)
     for fileName in fileList:
         os.remove(dirPath+"/"+fileName)
+        
+    pplacerDir = "%s/pplacer" %currentDir
+    files = os.listdir(pplacerDir)
+    for f in files:
+        os.remove(pplacerDir+"/"+f)

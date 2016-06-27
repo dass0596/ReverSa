@@ -23,7 +23,7 @@ class Similarity():
     def __init__(self, filename, score_adj,wDir):
         self.score = score_adj
         self.fasta_seq = filename
-        self.cwPath = "%s/testing" %wDir
+        self.cwPath = "%s/testing/" %wDir
         self.similitud_m = None
         self.norm_matrix = None 
     

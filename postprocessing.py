@@ -21,7 +21,7 @@ class Validate():
         #"query names" list with  file names of query sequences 
         self.query_name = query_names
         self.fasta_seq = fasta
-        self.cwPath = "%s/testing" %wDir
+        self.cwPath = "%s/testing/" %wDir
         self.jfile = None
         self.jfileMinus = None
         

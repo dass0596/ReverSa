@@ -23,7 +23,7 @@ def main(args, config):
     #Instance Preprocessing class
     window = Preprocessing(args.fasta_file, config['win_length'], config['win_step'])
     window.output_window()
-    print >> sys.stderr, "Created windows_sequence.fasta"
+    print >> sys.stderr, "Creating windows_sequence.fasta"
     
     #Instance Similarity and Composition class
     sim = Similarity(args.fasta_file, config['score_adj'],wDir)
@@ -32,22 +32,22 @@ def main(args, config):
     comp_matrix = comp_results.joined()
     #Join similarity and composition matrix for PCA
     join = pd.concat([comp_matrix, sim_matrix], axis= 1, join='inner')
-    print >> sys.stderr, "Calculated similarity and composition matrix"
+    print >> sys.stderr, "Calculating similarity and composition matrix"
     
     #Instance Reduction class
     pca = Reduction(join, config['pca_comp'])
     pca_data = pca.perform_pca()
-    print >> sys.stderr, "Performed PCA"
+    print >> sys.stderr, "Performing PCA"
     
     #Instance Clustering class
     cluster = Clustering(pca_data)
     clust_obj = cluster.plot()
-    print >> sys.stderr, "Performed clustering plot"
+    print >> sys.stderr, "Performing clustering plot"
     
     #Instance ClusterReport class
     report = ClusterReport(clust_obj)
     file_name, querySeq = report.output_queryseq()
-    print >> sys.stderr, "Done report of clusters"
+    print >> sys.stderr, "Doing report of clusters"
 
     #Instance Validate class
     valid = Validate(file_name, args.fasta_file,wDir)
