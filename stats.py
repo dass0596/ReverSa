@@ -3,11 +3,14 @@ Created on 16 de may. de 2016
 
 @author: Daniela Sanchez
 '''
-import itertools
+#import itertools
+#import math
+import numpy as np
 import scipy.stats
 from statsmodels.stats.multitest import multipletests
-import math
-
+import ast
+import os
+import linecache
 
 class Profiles():
     '''
@@ -25,6 +28,7 @@ class Profiles():
 
 
     def windowsAssigment(self):
+        os.chdir('profiles/')
         bestWin = {}
         for b, c in self.seqDict.items():
             intercepts =  []
@@ -33,30 +37,52 @@ class Profiles():
                 numInter = self.intercepts.loc[a,"intercept"]
                 intercepts.append(numInter)
                 
-            checkedProfiles = []
+            #checkedProfiles = []
             rawpvalues = []
             leng = len(intercepts)
-            iterProfiles = itertools.product([0,1], repeat=leng)
-            for l in iterProfiles:
+            
+            if leng ==2 or leng==3:
+                bestWin[b] = c
                 
-                if (l.count(1) >= 2 and l.count(1) <= math.ceil(leng)): # Check to avoid going over REDUNTANT permutations
+            else:
+                compressFile= "profile_%s.bz2" %leng
+                os.system("bunzip2 -k %s" %compressFile)
+                inFile = "profile_%s" %leng
+                
+        
+                for line in open(inFile):
+                    
+                    l = ast.literal_eval(line)
                     indexes1 = [i for i, x in enumerate(l) if x == 1]
                     newList1 = [intercepts[x] for x in indexes1]
                     indexes0 = [i for i, x in enumerate(l) if x == 0]
                     newList0 = [intercepts[x] for x in indexes0]
                     pvalue = scipy.stats.ttest_ind(newList1, newList0)[1]
-                    checkedProfiles.append(l)
                     rawpvalues.append(pvalue)
-
-            # adjust the raw pvalues for multiple hypothesis testing using Bonferroni correction for FDR
-            adjpvalues = multipletests(rawpvalues, alpha=0.05, method='hs', is_sorted=False, returnsorted=False)[1]
-            
-            # return the bestpvalue (corresponding to the best class assignment)  and the ID of the positive windows 
-            inposWindows = [i for i, x in enumerate(checkedProfiles[adjpvalues.argmin()]) if x == 1]
-            self.posWindows = [windows[x] for x in inposWindows] 
-            self.bestpvalue = min(adjpvalues)
-            self.bestProfile = checkedProfiles[adjpvalues.argmin()]
-            bestWin[b] = self.posWindows
-            #print self.bestpvalue, self.bestProfile, self.posWindows
+                    
+                    
+    
+                # adjust the raw pvalues for multiple hypothesis testing using Bonferroni correction for FDR
+                adjpvalues = multipletests(rawpvalues, alpha=0.05, method='hs', is_sorted=False, returnsorted=False)[1]
+               
+                # return the bestpvalue (corresponding to the best class assignment)  and the ID of the positive windows 
+                minPvalues = adjpvalues.argmin() + 1
+                getProfile = linecache.getline(inFile, minPvalues) 
+                bestProfile = ast.literal_eval(getProfile)
+                enumerate1 = [i for i, x in enumerate(bestProfile) if x == 1]
+                mean1 = np.mean([intercepts[x] for x in enumerate1])
+                enumerate0 = [i for i, x in enumerate(bestProfile) if x == 0]
+                mean0 = np.mean([intercepts[x] for x in enumerate0])
+                
+                if mean0 < mean1:
+                    posWindows0 = [windows[x] for x in enumerate0]
+                    bestWin[b] = posWindows0
+                
+                else:
+                    posWindows1 = [windows[x] for x in enumerate1]
+                    bestWin[b] = posWindows1
+                
+                os.remove(inFile)
+        os.chdir("..")
         return bestWin
     
