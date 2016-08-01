@@ -4,6 +4,7 @@ Created on 3 de jun. de 2016
 @author: Daniela Sanchez
 '''
 import os
+import shutil
 
 def cleaning(queryFiles):
     currentDir = os.getcwd()
@@ -14,11 +15,8 @@ def cleaning(queryFiles):
     for i in queryFiles:
         os.remove(i)
     dirPath = "%s/testing" %currentDir
-    fileList = os.listdir(dirPath)
-    for fileName in fileList:
-        os.remove(dirPath+"/"+fileName)
-        
+    shutil.rmtree(dirPath) 
+   
     pplacerDir = "%s/pplacer" %currentDir
-    files = os.listdir(pplacerDir)
-    for f in files:
-        os.remove(pplacerDir+"/"+f)
+    shutil.rmtree(pplacerDir)    
+   

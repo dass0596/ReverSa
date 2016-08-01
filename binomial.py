@@ -8,6 +8,7 @@ from Bio.Emboss.Applications import NeedleCommandline
 from Bio import SeqIO
 import re
 import itertools
+import pandas as pd
 
 
 class StatsBinom():
@@ -25,9 +26,11 @@ class StatsBinom():
         patt1= re.compile('\#\sIdentity\:\s+(\d+)\/(\d+)\s+\([0-9\.]+\%\)')
         patt2= re.compile('\#\sGaps\:\s+(\d+)\/\d+')
         out = open("reversa_result.txt", "w")
+        results = []
         
         for j, i in self.bestWin.items():
             out.write('cluster %s \n' %j)
+            
             for a, b in itertools.combinations(i,2):
                 seq1 = patt.split(a)[0]
                 seq2 = patt.split(b)[0]
@@ -72,9 +75,14 @@ class StatsBinom():
                     totalDif= 1-(float(identity)/100)
                     pvalue = stats.binom.cdf(difWin, size, totalDif)
                     
+                    results.append({'seq1': a, 'seq2': b, 'pvalue': pvalue})
+                    
                     if pvalue <= 1.00e-20:
                         #print 'combination:', a, b, 'pvalue: ', pvalue
                         out.write('combination: %s  %s pvalue: %s \n' %(a,b,pvalue))
         
         out.close()
+        dfResults = pd.DataFrame(results)
+        dfResults.to_csv('results.csv')
+
                 

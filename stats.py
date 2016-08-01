@@ -18,9 +18,11 @@ class Profiles():
     '''
 
 
-    def __init__(self, interceptsMat, querySeq):
+    def __init__(self, interceptsMat, querySeq, wDir, profilePath):
         self.intercepts = interceptsMat
         self.seqDict= querySeq
+        self.wDir = wDir
+        self.profiles = profilePath
         self.posWindows = None
         self.bestpvalue = None
         self.bestProfile = None
@@ -28,7 +30,8 @@ class Profiles():
 
 
     def windowsAssigment(self):
-        os.chdir('profiles/')
+         
+        os.chdir(self.profiles)
         bestWin = {}
         for b, c in self.seqDict.items():
             intercepts =  []
@@ -83,6 +86,6 @@ class Profiles():
                     bestWin[b] = posWindows1
                 
                 os.remove(inFile)
-        os.chdir("..")
+        os.chdir(self.wDir)
         return bestWin
     

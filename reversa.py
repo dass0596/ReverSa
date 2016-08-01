@@ -1,75 +1,64 @@
-#!/usr/bin/env python
+'''
+Created on 31 de jul. de 2016
 
-import sys
-import os
-import pandas as pd
-
-from preprocessing import Preprocessing
-from similarity import Similarity
-from composition import Composition
-from pca import Reduction
-from clustering import Clustering
-from cluster import ClusterReport
-from postprocessing import Validate
-from jplace import ParseJplace
-from stats import Profiles
-from binomial import StatsBinom
-from clean import cleaning
+@author: daniela
+'''
+from principal import basicMode
 from parse import arguments
+from config_file import configFile
+from test import compareResults
+from plot import graph
 
+import os, datetime
+import sys
 
 def main(args, config):
-    wDir = os.getcwd()
-    #Instance Preprocessing class
-    window = Preprocessing(args.fasta_file, config['win_length'], config['win_step'])
-    window.output_window()
-    print >> sys.stderr, "Creating windows_sequence.fasta"
     
-    #Instance Similarity and Composition class
-    sim = Similarity(args.fasta_file, config['score_adj'],wDir)
-    sim_matrix = sim.mcl_perform() 
-    comp_results = Composition(config['kmer_len'])
-    comp_matrix = comp_results.joined()
-    #Join similarity and composition matrix for PCA
-    join = pd.concat([comp_matrix, sim_matrix], axis= 1, join='inner')
-    print >> sys.stderr, "Calculating similarity and composition matrix"
+    fasta_file = os.path.join(os.getcwd(),args.fasta_file)
+    profilePath = os.path.join(os.getcwd(),'profiles')
+    wDir = os.path.join(os.getcwd(), datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    os.mkdir(wDir)      
     
-    #Instance Reduction class
-    pca = Reduction(join, config['pca_comp'])
-    pca_data = pca.perform_pca()
-    print >> sys.stderr, "Performing PCA"
     
-    #Instance Clustering class
-    cluster = Clustering(pca_data)
-    clust_obj = cluster.plot()
-    print >> sys.stderr, "Performing clustering plot"
-    
-    #Instance ClusterReport class
-    report = ClusterReport(clust_obj)
-    file_name, querySeq = report.output_queryseq()
-    print >> sys.stderr, "Doing report of clusters"
-
-    #Instance Validate class
-    valid = Validate(file_name, args.fasta_file,wDir)
-    jfileComp, jfileMinus = valid.roundTwo()
-    print >> sys.stderr, "Validation of results"
-    
-    #Instance ParseJplace Class
-    parsing = ParseJplace(jfileComp, jfileMinus)
-    corrMat = parsing.correlation()
-    print >> sys.stderr, "Doing profiles"
-    
-    #Instance Profile Class
-    ttest = Profiles(corrMat, querySeq)
-    bestWin = ttest.windowsAssigment()
-    print >>sys.stderr, "Doing permutations"
-    
-    #Instance StatsBinom
-    finalResult = StatsBinom(args.fasta_file, config['win_length'],bestWin)
-    finalResult.binomial()
-    
-    cleaning(file_name)
-
+    if int(args.mode) == 1:
+        os.chdir(wDir)
+        basicMode(config, fasta_file, profilePath)
+        
+    if int(args.mode) == 2:   
+        newConfig = config.copy()
+        dfCompare = os.path.join(os.getcwd(),args.compare)
+        os.chdir(wDir)
+        
+        allResults = {}
+        for i,j in config.items():
+            if type(j) is list:
+                label = i
+                valStart= j[0]
+                valStop= j[1]
+                valStep= j[2]
+                
+                k = int(valStart)
+                while k <= int(valStop):
+                    newConfig[i] = k
+                    folder = i + str(k)
+                    subDir = os.path.join(wDir, folder)
+                    os.mkdir(subDir)
+                    os.chdir(subDir)
+                    if i == 'win_length':
+                        newConfig['win_step'] = k
+                    
+                    configFile(newConfig)
+                    basicMode(newConfig, fasta_file, profilePath)
+                    
+                    result, trueEvents = compareResults(dfCompare)
+                    allResults[k] = result
+                        
+                    k = k + int(valStep)     
+                    os.chdir('..')
+                        
+                    
+        graph(allResults, label, trueEvents)
+            
 
 if __name__ == '__main__':
     args, config = arguments()
