@@ -1,7 +1,7 @@
 '''
 Created on 15 de mar. de 2016
 
-@author: daniela
+@author: Daniela Sanchez
 '''
 import ConfigParser
 

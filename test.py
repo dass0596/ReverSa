@@ -1,3 +1,8 @@
+'''
+Created on 31 de jul. de 2016
+
+@author: Daniela Sanchez
+'''
 import pandas as pd
 import re
 

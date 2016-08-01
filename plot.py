@@ -1,7 +1,7 @@
 '''
 Created on 31 de jul. de 2016
 
-@author: daniela
+@author: Daniela Sanchez
 '''
 
 import matplotlib.pyplot as plt

@@ -1,8 +1,10 @@
 '''
 Created on 31 de jul. de 2016
 
-@author: daniela
+@author: Daniela Sanchez
 '''
+#!/usr/bin/env python
+
 from principal import basicMode
 from parse import arguments
 from config_file import configFile

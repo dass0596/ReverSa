@@ -1,10 +1,8 @@
 '''
 Created on 31 de jul. de 2016
 
-@author: daniela
+@author: Daniela Sanchez
 '''
-#!/usr/bin/env python
-
 import sys
 import os
 import pandas as pd
