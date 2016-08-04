@@ -31,7 +31,8 @@ def main(args, config):
         dfCompare = os.path.join(os.getcwd(),args.compare)
         os.chdir(wDir)
         
-        allResults = {}
+        xList = []
+        yList = []
         for i,j in config.items():
             if type(j) is list:
                 label = i
@@ -39,8 +40,8 @@ def main(args, config):
                 valStop= j[1]
                 valStep= j[2]
                 
-                k = int(valStart)
-                while k <= int(valStop):
+                k = float(valStart)
+                while k <= float(valStop):
                     newConfig[i] = k
                     folder = i + str(k)
                     subDir = os.path.join(wDir, folder)
@@ -53,13 +54,17 @@ def main(args, config):
                     basicMode(newConfig, fasta_file, profilePath)
                     
                     result, trueEvents = compareResults(dfCompare)
-                    allResults[k] = result
+                    xList.append(k)
+                    yList.append(result)
+    
                         
-                    k = k + int(valStep)     
+                    k = k + float(valStep)     
                     os.chdir('..')
                         
                     
-        graph(allResults, label, trueEvents)
+        graph(xList, yList, label, trueEvents)
+        print xList
+        print yList
             
 
 if __name__ == '__main__':
