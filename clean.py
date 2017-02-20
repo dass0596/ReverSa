@@ -8,15 +8,17 @@ import shutil
 
 def cleaning(queryFiles):
     currentDir = os.getcwd()
-    os.remove('needle.txt')
-    os.remove('needle1.txt')
-    os.remove('water.txt')
-    os.remove('distance.csv')
+    reFiles = ['needle.txt', 'needle1.txt', 'water.txt']
+    
+    for a in reFiles:
+        if os.path.isfile(a):
+            os.remove(a)
+
     for i in queryFiles:
         os.remove(i)
     dirPath = "%s/testing" %currentDir
-    shutil.rmtree(dirPath) 
+    #shutil.rmtree(dirPath) 
    
     pplacerDir = "%s/pplacer" %currentDir
-    shutil.rmtree(pplacerDir)    
+    #shutil.rmtree(pplacerDir)    
    

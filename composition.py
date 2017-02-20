@@ -83,5 +83,6 @@ class Composition:
         self.gc_content()
         self.calculate_kmer()
         self.join = pd.concat([self.composition_df, self.gc_data], axis= 1, join='inner')
+        self.join.to_csv('composition.csv')
         return self.composition_df
         

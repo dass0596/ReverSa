@@ -19,5 +19,6 @@ class Reduction():
         #dimensional reduction using SVD of joined clustering
         self.pca_object = PCA(self.components).fit(self.joined)
         transform_df = pd.DataFrame(self.pca_object.transform(self.joined), index=self.joined.index)
+        transform_df.to_csv('pca.csv')
         return transform_df
         

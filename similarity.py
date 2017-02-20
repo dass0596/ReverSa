@@ -30,6 +30,7 @@ class Similarity():
     def water_alignment(self):
         #perform water alignment for each sequence versus all, store scores into a matrix
         similitud_d = OrderedDict()
+        normValue = OrderedDict()
         pattern= re.compile(r'Score: (.*)')
         for seq in SeqIO.parse('windows_sequence.fasta', 'fasta'):
             cline = WaterCommandline(asequence= 'asis:%s' %str(seq.seq), bsequence='windows_sequence.fasta', gapopen=10, gapextend=0.5, outfile='water.txt')
@@ -41,13 +42,17 @@ class Similarity():
         similitud = pd.DataFrame.from_dict(similitud_d, orient='index', dtype=float)
         #set the same names for index and columns
         similitud.columns = similitud.index.tolist()
+        similitud.to_csv('aligment.csv')
         #Normalize the scores 1-(score/score max of alignment)
         for i in  similitud.index.tolist():
             for j in similitud.columns.tolist():
                 if i == j:
                     max_score = similitud.loc[i,j]
+                    normValue[i] = max_score
                 similitud.loc[i,j] = 1-(similitud.loc[i,j]/max_score)
-        #similitud.to_csv('data_sim.csv')
+        normData = pd.DataFrame.from_dict(normValue, orient='index', dtype=float)
+        normData.to_csv('max_scores.csv')
+        similitud.to_csv('data_sim.csv')
         self.similitud = similitud
         
     def generate_dist(self):
@@ -82,7 +87,7 @@ class Similarity():
                 #normalize the distance value
                 dist_score =  1-df.loc[left_row,left_column]
                 self.similitud.loc[i,j] = self.similitud.loc[i,j] * dist_score
-        #self.similitud.to_csv('sim_dist.csv')         
+        self.similitud.to_csv('sim_dist.csv')         
             
     def calculate_adjacency(self):
         #calculate adjacency depend on the sequence(index!=column) and the score(K>Value[i,j])
@@ -98,6 +103,7 @@ class Similarity():
                     if k > self.similitud.loc[i,j]:
                         valor = 1
                 self.similitud.loc[i,j]= valor
+            self.similitud.to_csv('adjacency.csv')
         
     def mcl_perform(self):
         #Cluster all values(1) using Markov Cluster Algorithm 
@@ -120,12 +126,12 @@ class Similarity():
                 for m in h:
                     if o != m:
                         self.similitud.iloc[o,m] = count
-        #self.similitud.to_csv('adjacency_modif.csv')
+        self.similitud.to_csv('mcl.csv')
         adjacency = np.sum(self.similitud,axis=1)
         #Replace 0 to avoid inf values in the normalization
         ad = adjacency.replace(0,0.00001)
         #Normalize
         matrix_ad = np.log(ad) 
         self.norm_matrix = pd.DataFrame(matrix_ad, columns=['adj'])
-        #self.norm_matrix.to_csv('adj_col.csv')
+        self.norm_matrix.to_csv('adj_col.csv')
         return self.norm_matrix

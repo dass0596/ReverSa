@@ -17,6 +17,7 @@ def arguments():
     parser.add_argument('--compare')
     parser.add_argument('--config_file')
     args = parser.parse_args()
+    
     #Read config_file
     config.read(args.config_file)
     #Create a dictionary to store values of the config_file

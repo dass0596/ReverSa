@@ -27,13 +27,15 @@ class StatsBinom():
         patt2= re.compile('\#\sGaps\:\s+(\d+)\/\d+')
         out = open("reversa_result.txt", "w")
         results = []
+        #print self.bestWin
         
         for j, i in self.bestWin.items():
-            out.write('cluster %s \n' %j)
+            out.write('cluster %s \n' %j) 
             
             for a, b in itertools.combinations(i,2):
                 seq1 = patt.split(a)[0]
                 seq2 = patt.split(b)[0]
+                #print seq1, seq2
                 if seq1 != seq2:
                     for fasta in SeqIO.parse(self.fastaFile, "fasta"):
                         if fasta.id == seq1:
@@ -43,7 +45,7 @@ class StatsBinom():
                          
                     needle_cline = NeedleCommandline(asequence="asis:%s" %str(aseq), bsequence="asis:%s" %str(bseq),gapopen=10, gapextend=0.5, outfile="needle.txt")
                     needle_cline()
-                    
+
                     
                     for line in open('needle.txt'):
                         ident= pattern.search(line)
@@ -58,6 +60,7 @@ class StatsBinom():
                     
                     ncline = NeedleCommandline(asequence="asis:%s" %str(awin), bsequence="asis:%s" %str(bwin),gapopen=10, gapextend=0.5, outfile="needle1.txt")
                     ncline()
+                    
                     
                     for line1 in open('needle1.txt'):
                         #print line1

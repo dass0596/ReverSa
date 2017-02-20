@@ -33,7 +33,9 @@ class Profiles():
          
         os.chdir(self.profiles)
         bestWin = {}
+        
         for b, c in self.seqDict.items():
+            print b, c
             intercepts =  []
             windows = c
             for a in c:
@@ -45,7 +47,7 @@ class Profiles():
             leng = len(intercepts)
             
             if leng ==2 or leng==3:
-                bestWin[b] = c
+                bestWin[int(b)] = c
                 
             else:
                 compressFile= "profile_%s.bz2" %leng
@@ -79,11 +81,11 @@ class Profiles():
                 
                 if mean0 < mean1:
                     posWindows0 = [windows[x] for x in enumerate0]
-                    bestWin[b] = posWindows0
+                    bestWin[int(b)] = posWindows0
                 
                 else:
                     posWindows1 = [windows[x] for x in enumerate1]
-                    bestWin[b] = posWindows1
+                    bestWin[int(b)] = posWindows1
                 
                 os.remove(inFile)
         os.chdir(self.wDir)

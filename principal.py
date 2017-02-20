@@ -8,14 +8,14 @@ import os
 import pandas as pd
 
 from preprocessing import Preprocessing
-from similarity import Similarity
+from solutions import Similarity
 from composition import Composition
 from pca import Reduction
 from clustering import Clustering
 from cluster import ClusterReport
 from postprocessing import Validate
 from jplace import ParseJplace
-from stats import Profiles
+from kmers_test import Profiles
 from binomial import StatsBinom
 from clean import cleaning
 
@@ -31,8 +31,10 @@ def basicMode(config,fasta_file, profilePath):
         
     
     #Instance Preprocessing class
-    window = Preprocessing(fasta_file, config['win_length'], config['win_step'])
+    window = Preprocessing(fasta_file, config['win_length'], config['win_step'], "windows_sequence.fasta")
     window.output_window()
+    reverseSeq = Preprocessing(fasta_file, config['win_length'], config['win_step'], "reverse_windows.fasta")
+    reverseSeq.output_window()
     print >> sys.stderr, "Creating windows_sequence.fasta"
     
     #Instance Similarity and Composition class
@@ -77,6 +79,7 @@ def basicMode(config,fasta_file, profilePath):
     #Instance StatsBinom
     finalResult = StatsBinom(fasta_file, config['win_length'],bestWin)
     finalResult.binomial()
+    print >>sys.stderr, "Calculating p-value"
     
     cleaning(file_name)
     

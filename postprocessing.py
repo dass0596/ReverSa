@@ -9,6 +9,7 @@ from Bio.Align import MultipleSeqAlignment
 
 import os
 import re
+import sys
 import os.path
 
 
@@ -32,7 +33,7 @@ class Validate():
         self.jfile =[] 
         for i in self.query_name:
             clust = pattern.split(i)[2]
-            print i , type(i)
+            
             file_name = 'multiple_ali%s.fasta' %clust
             os.system('mafft --add %s --quiet --reorder testing/align.fasta >testing/%s' %(i,file_name)) 
             alignFile = alignFile + [file_name,]
@@ -84,8 +85,12 @@ class Validate():
                     os.system('mafft --add %s --quiet --reorder %s >%s'% (j, fasta_name, multiali_name))  
                     
                     jason_name = 'multiple_ali%s.jplace' %id_jfile
-                    self.jfileMinus.append(jason_name)
-                    
+
                     #wrap pplacer
-                    os.system('pplacer --out-dir pplacer  -p -t testing/RAxML_result.%s -s testing/RAxML_info.%s %s' % (rax_name, rax_name, multiali_name))       
+                    if not os.path.isfile('pplacer/%s' %jason_name):
+                        self.jfileMinus.append(jason_name)
+                        os.system('pplacer --out-dir pplacer  -p -t testing/RAxML_result.%s -s testing/RAxML_info.%s %s' % (rax_name, rax_name, multiali_name))       
+        print self.jfile
+        print self.jfileMinus
+       
         return self.jfile, self.jfileMinus

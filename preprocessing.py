@@ -7,10 +7,11 @@ from Bio import SeqIO
 
 class Preprocessing():
     
-    def __init__(self, filename, win_length, win_step):
+    def __init__(self, filename, win_length, win_step, output):
         self.filename = filename
-        self.win_length = win_length
-        self.win_step = win_step
+        self.win_length = int(win_length)
+        self.win_step = int(win_step)
+        self.outFile = output
         self.iniseq = None
                
     def window_generator(self, seq):
@@ -22,7 +23,7 @@ class Preprocessing():
     def output_window(self): 
         #save the windows generate in a fasta
         k =  0.5
-        out = open("windows_sequence.fasta", "w")
+        out = open(self.outFile, "w")
         for fasta in SeqIO.parse(self.filename, "fasta"):
             seq , name = str(fasta.seq), fasta.id
             lenseq = len(seq)
@@ -34,3 +35,5 @@ class Preprocessing():
             if (self.win_length * k) < (lenseq - (self.iniseq + self.win_length)):
                 out.write('>'+name+'_'+str(firstSeq)+'-'+str(lenseq)+'\n' + seq[-(self.win_length):]+'\n')      
         out.close()      
+
+
